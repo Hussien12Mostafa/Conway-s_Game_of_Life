@@ -2,12 +2,12 @@
 #include <unistd.h>
 
 using namespace std;
-
+const float prob=.03;
 const int gridSize = 100;
 void printGrid(bool gridOne[gridSize + 1][gridSize + 1]);
 void deterministic(bool gridOne[gridSize + 1][gridSize + 1]);
-
-
+void god1(bool gridOne[gridSize + 1][gridSize + 1]);
+void god2(bool gridOne[gridSize + 1][gridSize + 1]);
 int main()
 {
 
@@ -27,6 +27,7 @@ int main()
   {
     printGrid(gridOne);
     deterministic(gridOne);
+    god1(gridOne);
     usleep(2000000);
   }
 }
@@ -41,9 +42,10 @@ void printGrid(bool gridOne[gridSize + 1][gridSize + 1])
         cout << " O ";
       else
         cout << " . ";
-      if (col == gridSize - 1)
-        cout << endl;
+      
+        
     }
+    cout << endl;
   }
   cout << "--------------------------------------------------------------------------------------------------------------------------------" << endl;
 }
@@ -86,4 +88,28 @@ void deterministic(bool gridOne[gridSize + 1][gridSize + 1])
       }
     }
   }
+}
+
+
+void god1(bool gridOne[gridSize + 1][gridSize + 1]){
+
+ for (int row = 1; row < gridSize; row++)
+  {
+    for (int col = 1; col < gridSize; col++)
+    {
+      if((float) rand()/RAND_MAX<prob)
+        gridOne[row][col]= !gridOne[row][col];
+    }
+  }  
+}
+void god2(bool gridOne[gridSize + 1][gridSize + 1]){
+
+ for (int row = 1; row < gridSize; row++)
+  {
+    for (int col = 1; col < gridSize; col++)
+    {
+      if((float) rand()/RAND_MAX<prob)
+        gridOne[row][col]= !gridOne[row][col];
+    }
+  }  
 }
