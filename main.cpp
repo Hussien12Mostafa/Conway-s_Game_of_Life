@@ -1,11 +1,13 @@
 #include <iostream>
 #include <unistd.h>
+#include <SFML/Graphics.hpp>
 
 using namespace std;
 // probability for seeds/terminates life cell for first god
 const float probGod1=.00001;
 const float probGod2=1;
 const float probGod3=.01;
+const int CELL_SIZE = 5;
 // square grid size
 const int gridSize = 100;
 // function for print grid
@@ -27,6 +29,8 @@ void seed_pulsar(bool gridOne[gridSize + 1][gridSize + 1], int x, int y);
 void myShape(bool gridOne[gridSize + 1][gridSize + 1],int x,int y);
 // buffer train
 void buffer_train(bool gridOne[gridSize + 1][gridSize + 1], int x, int y);
+//draw function
+void draw_board(sf::RenderWindow& window, bool gridOne[gridSize + 1][gridSize + 1]);
 // now functions i used for every quarter in grid i loop 
 void loopQuarterForGod3(bool gridOne[gridSize + 1][gridSize + 1],int startX,int endX,int startY,int endY);
 void loopQuarterForGod2(bool gridOne[gridSize + 1][gridSize + 1],int startX,int endX,int startY,int endY);
@@ -43,19 +47,42 @@ int main()
         gridOne[row][col] = true;
     }
   }
-  // print grid
-  printGrid(gridOne);
+sf::RenderWindow window(sf::VideoMode(gridSize * CELL_SIZE, gridSize * CELL_SIZE), "Game of Life");
+
   // loop algorthim 100 times
   for (int i =0;i<100;i++)
   {
-    printGrid(gridOne);
-    deterministic(gridOne);
-    god1(gridOne);
-    god2(gridOne);
-    god3(gridOne);
-// sleep some seconds to see grid
-    usleep(200000);
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+        }
+//draw board 
+        draw_board(window, gridOne);
+        deterministic(gridOne);
+        god1(gridOne);
+        god2(gridOne);
+        god3(gridOne);
+        window.display();
+    // sleep some seconds to see grid
+        usleep(200000);
   }
+}
+//draw board
+  void draw_board(sf::RenderWindow& window, bool gridOne[gridSize + 1][gridSize + 1]) {
+    for (int row = 0; row < gridSize; row++) {
+        for (int col = 0; col < gridSize; col++) {
+            sf::RectangleShape cell(sf::Vector2f(CELL_SIZE, CELL_SIZE));
+            cell.setPosition(col * CELL_SIZE, row * CELL_SIZE);
+            if (gridOne[row][col]) {
+                cell.setFillColor(sf::Color::White);
+            } else {
+                cell.setFillColor(sf::Color::Black);
+            }
+            window.draw(cell);
+        }
+    }
 }
 // here print grid
 void printGrid(bool gridOne[gridSize + 1][gridSize + 1])

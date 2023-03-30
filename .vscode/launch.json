@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": true,
+      "cwd": "e:/projects/google_summer/my git/Conway-s_Game_of_Life",
+      "program": "e:/projects/google_summer/my git/Conway-s_Game_of_Life/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "C:/mingw32/bin/gdb.exe",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}
