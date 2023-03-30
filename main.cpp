@@ -2,24 +2,39 @@
 #include <unistd.h>
 
 using namespace std;
-const float prob=.00001;
+// probability for seeds/terminates life cell for first god
+const float probGod1=.00001;
+const float probGod2=1;
+const float probGod3=.01;
+// square grid size
 const int gridSize = 100;
+// function for print grid
 void printGrid(bool gridOne[gridSize + 1][gridSize + 1]);
+// Conway Game of Life algorthim
 void deterministic(bool gridOne[gridSize + 1][gridSize + 1]);
+// first god function
 void god1(bool gridOne[gridSize + 1][gridSize + 1]);
+// second god function
 void god2(bool gridOne[gridSize + 1][gridSize + 1]);
+// third god function
 void god3(bool gridOne[gridSize + 1][gridSize + 1]);
+// now functions to create some shapes
+// glunder shape
 void add_glunder(bool gridOne[gridSize + 1][gridSize + 1],int x,int y);
+// seed pulsar shape
 void seed_pulsar(bool gridOne[gridSize + 1][gridSize + 1], int x, int y);
+// my shape (i create it)
 void myShape(bool gridOne[gridSize + 1][gridSize + 1],int x,int y);
+// buffer train
 void buffer_train(bool gridOne[gridSize + 1][gridSize + 1], int x, int y);
+// now functions i used for every quarter in grid i loop 
 void loopQuarterForGod3(bool gridOne[gridSize + 1][gridSize + 1],int startX,int endX,int startY,int endY);
 void loopQuarterForGod2(bool gridOne[gridSize + 1][gridSize + 1],int startX,int endX,int startY,int endY);
 int main()
 {
-
+// create empty grid
   bool gridOne[gridSize + 1][gridSize + 1] = {};
-
+// full grid row live and row dead
   for (int row = 1; row < gridSize; row++)
   {
     for (int col = 1; col < gridSize; col++)
@@ -28,7 +43,9 @@ int main()
         gridOne[row][col] = true;
     }
   }
+  // print grid
   printGrid(gridOne);
+  // loop algorthim 100 times
   for (int i =0;i<100;i++)
   {
     printGrid(gridOne);
@@ -36,12 +53,11 @@ int main()
     god1(gridOne);
     god2(gridOne);
     god3(gridOne);
-    
-    
+// sleep some seconds to see grid
     usleep(200000);
   }
 }
-
+// here print grid
 void printGrid(bool gridOne[gridSize + 1][gridSize + 1])
 {
   for (int row = 1; row < gridSize; row++)
@@ -59,17 +75,20 @@ void printGrid(bool gridOne[gridSize + 1][gridSize + 1])
   }
   cout << "--------------------------------------------------------------------------------------------------------------------------------" << endl;
 }
-
+// Conway Game of Life algorthim
 void deterministic(bool gridOne[gridSize + 1][gridSize + 1])
 {
+// first i take copy of grid 
   bool gridTwo[gridSize + 1][gridSize + 1] = {};
 
   std::copy(&gridOne[0][0], &gridOne[0][0]+(gridSize+1)*(gridSize+1),&gridTwo[0][0]);
-
+// loop for rows in grid
   for (int row = 1; row < gridSize; row++)
   {
+// loop for coloums in grid
     for (int col = 1; col < gridSize; col++)
     {
+// count live neighbours cells
       int alive = 0;
       for (int r = -1; r < 2; r++)
       {
@@ -84,6 +103,7 @@ void deterministic(bool gridOne[gridSize + 1][gridSize + 1])
           }
         }
       }
+// now check rules for algortim
       if (alive < 2)
       {
         gridOne[row][col] = false;
@@ -102,42 +122,38 @@ void deterministic(bool gridOne[gridSize + 1][gridSize + 1])
     }
   }
 }
-
+// first god loop for every cell and with random low probability may be change it
 void god1(bool gridOne[gridSize + 1][gridSize + 1]){
 
  for (int row = 1; row < gridSize; row++)
   {
     for (int col = 1; col < gridSize; col++)
     {
-      if((float) rand()/RAND_MAX<prob)
+      if((float) rand()/RAND_MAX<probGod1)
         gridOne[row][col]= !gridOne[row][col];
     }
   }  
 }
+//second god 
 void god2(bool gridOne[gridSize + 1][gridSize + 1]){
+// i divided grid to 5 parts and check if all cells dead i seeds them with shape if random probability > constant value
   loopQuarterForGod2(gridOne,1,(gridSize/4)+15,1,(gridSize/4)+15);
   loopQuarterForGod2(gridOne,1,(gridSize/4)+15,(gridSize/2)+10,gridSize);
   loopQuarterForGod2(gridOne,(gridSize/2)+10,gridSize,1,(gridSize/4)+15);
   loopQuarterForGod2(gridOne,(gridSize/2)+10,gridSize,(gridSize/2)+10,gridSize);
   loopQuarterForGod2(gridOne,(gridSize/4)+16,(gridSize/2)+10,(gridSize/4)+16,(gridSize/2)+10);
 }
-void god3(bool gridOne[gridSize + 1][gridSize + 1]){
-loopQuarterForGod3(gridOne,1,gridSize/2,1,gridSize/2);
-loopQuarterForGod3(gridOne,1,gridSize/2,gridSize/2,gridSize);
-loopQuarterForGod3(gridOne,gridSize/2,gridSize,1,gridSize/2);
-loopQuarterForGod3(gridOne,gridSize/2,gridSize,gridSize/2,gridSize);
-}
 void loopQuarterForGod2(bool gridOne[gridSize + 1][gridSize + 1],int startX,int endX,int startY,int endY){
-  bool checkEmpty=true;
+  int checkLive=0;
   for(int row =startX;row<=endX;row++){
     for(int col =startY;col<=endY;col++){
       if(gridOne[row][col]==true){
-        checkEmpty=false;
+        checkLive++;
       }
     }
   }
   
-  if (checkEmpty)
+  if (checkLive<10 && (float) rand()/RAND_MAX<probGod2)
     if (startX==1 && startY==1)
       add_glunder(gridOne,startX+(gridSize/4)-6,startY+(gridSize/4)-15);
     else if(startX==1 && startY>=gridSize/2)
@@ -146,10 +162,19 @@ void loopQuarterForGod2(bool gridOne[gridSize + 1][gridSize + 1],int startX,int 
       seed_pulsar(gridOne,startX+(gridSize/4)-6,startY+(gridSize/4)-15);
     else if(startX>=gridSize/2 && startY>=gridSize/2)
       add_glunder(gridOne,startX+(gridSize/4)-6,startY+(gridSize/4)-6);
-    else{
-      
+    else
       myShape(gridOne,startX,startY);
-    }
+    
+}
+
+// third god 
+void god3(bool gridOne[gridSize + 1][gridSize + 1]){
+//i divided grid to 5 parts and check if count live cells is low i seeds some of them with random probability
+  loopQuarterForGod3(gridOne,1,(gridSize/4)+15,1,(gridSize/4)+15);
+  loopQuarterForGod3(gridOne,1,(gridSize/4)+15,(gridSize/2)+10,gridSize);
+  loopQuarterForGod3(gridOne,(gridSize/2)+10,gridSize,1,(gridSize/4)+15);
+  loopQuarterForGod3(gridOne,(gridSize/2)+10,gridSize,(gridSize/2)+10,gridSize);
+  loopQuarterForGod3(gridOne,(gridSize/4)+16,(gridSize/2)+10,(gridSize/4)+16,(gridSize/2)+10);
 }
 void loopQuarterForGod3(bool gridOne[gridSize + 1][gridSize + 1],int startX,int endX,int startY,int endY){
   int count=0;
@@ -159,7 +184,7 @@ void loopQuarterForGod3(bool gridOne[gridSize + 1][gridSize + 1],int startX,int 
         count++;
     }
   }
-  if (count>= ((gridSize/2)*(gridSize/2))*.5){
+  if (count>= (((gridSize/4)+15)*((gridSize/4)+15))*.5){
     for(int row =startX;row<=endX;row++){
       for(int col =startY;col<=endY;col++){
         gridOne[row][col]=false;
@@ -169,12 +194,15 @@ void loopQuarterForGod3(bool gridOne[gridSize + 1][gridSize + 1],int startX,int 
   else if(count<10){
     for(int row =startX;row<=endX;row++){
       for(int col =startY;col<=endY;col++){
-        if((float) rand()/RAND_MAX<prob)
+        if((float) rand()/RAND_MAX<probGod3)
           gridOne[row][col]=true;
       }
     }
   }
 }
+
+
+//now functions create shapes
 void myShape(bool gridOne[gridSize + 1][gridSize + 1],int x,int y){
     gridOne[x][y] = true;
     gridOne[x][y+1] = true;
