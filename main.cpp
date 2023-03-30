@@ -1,7 +1,8 @@
 #include <iostream>
 #include <unistd.h>
 #include <SFML/Graphics.hpp>
-
+#include <numeric>
+#include <vector>
 using namespace std;
 // probability for seeds/terminates life cell for first god
 const float probGod1=.00001;
@@ -31,13 +32,19 @@ void myShape(bool gridOne[gridSize + 1][gridSize + 1],int x,int y);
 void buffer_train(bool gridOne[gridSize + 1][gridSize + 1], int x, int y);
 //draw function
 void draw_board(sf::RenderWindow& window, bool gridOne[gridSize + 1][gridSize + 1]);
+//draw histogram
+void draw_histogram(sf::RenderWindow& window, vector<int> data) ;
 // now functions i used for every quarter in grid i loop 
 void loopQuarterForGod3(bool gridOne[gridSize + 1][gridSize + 1],int startX,int endX,int startY,int endY);
 void loopQuarterForGod2(bool gridOne[gridSize + 1][gridSize + 1],int startX,int endX,int startY,int endY);
 int main()
 {
 // create empty grid
-  bool gridOne[gridSize + 1][gridSize + 1] = {};
+bool gridOne[gridSize + 1][gridSize + 1] = {};
+// vector for histogram
+vector<int> live_counts;
+//counter for snapshot
+int c=0;
 // full grid row live and row dead
   for (int row = 1; row < gridSize; row++)
   {
@@ -47,25 +54,54 @@ int main()
         gridOne[row][col] = true;
     }
   }
-sf::RenderWindow window(sf::VideoMode(gridSize * CELL_SIZE, gridSize * CELL_SIZE), "Game of Life");
+ sf::RenderWindow board_window(sf::VideoMode(gridSize * CELL_SIZE, gridSize * CELL_SIZE), "Game of Life");
+ sf::RenderWindow histogram_window(sf::VideoMode(gridSize * CELL_SIZE, gridSize * CELL_SIZE), "Histogram");
 
   // loop algorthim 100 times
   for (int i =0;i<100;i++)
   {
-        sf::Event event;
-        while (window.pollEvent(event)) {
+       sf::Event event;
+        while (board_window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
-                window.close();
+                board_window.close();
+                histogram_window.close();
+            } else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::S) {
+                // Save a snapshot of the current state of the board
+                sf::Texture texture;
+                texture.create(board_window.getSize().x, board_window.getSize().y);
+                texture.update(board_window);
+
+                sf::Image image = texture.copyToImage();
+                image.saveToFile("snapshot"+to_string (c)+".png");
+                c++;
             }
         }
 //draw board 
-        draw_board(window, gridOne);
+        draw_board(board_window, gridOne);
+// count live
+        int live=0;
+        for (int row=0;row<=gridSize;row++){
+          //int live=0;
+          for (int col=0;col<=gridSize;col++){
+            if(gridOne[row][col])
+              live++;
+          }
+          
+        }
+        live_counts.push_back(live);
+        
+        histogram_window.clear(sf::Color::Black);
+        
+        draw_histogram(histogram_window, live_counts);
+        //live_counts.clear();
         deterministic(gridOne);
         //god1(gridOne);
         god2(gridOne);
         god3(gridOne);
-        window.display();
-    // sleep some seconds to see grid
+// Display the windows
+        board_window.display();
+        histogram_window.display();
+// sleep some seconds to see grid
         usleep(200000);
   }
 }
@@ -82,6 +118,17 @@ sf::RenderWindow window(sf::VideoMode(gridSize * CELL_SIZE, gridSize * CELL_SIZE
             }
             window.draw(cell);
         }
+    }
+}
+//draw histogram 
+void draw_histogram(sf::RenderWindow& window, vector<int> data) {
+    int max_value = *max_element(data.begin(), data.end());
+    sf::RectangleShape bar(sf::Vector2f(CELL_SIZE, CELL_SIZE));
+    bar.setFillColor(sf::Color::White);
+    for (int i = 0; i < data.size(); i++) {
+        float res=(float)data[i]/ (gridSize*gridSize);
+        bar.setPosition( ((i + 1) * CELL_SIZE),window.getSize().y-(res * CELL_SIZE *window.getSize().y) );
+        window.draw(bar);
     }
 }
 // here print grid
