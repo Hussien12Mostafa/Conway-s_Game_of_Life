@@ -122,11 +122,15 @@ int c=0;
 }
 //draw histogram 
 void draw_histogram(sf::RenderWindow& window, vector<int> data) {
-    int max_value = *max_element(data.begin(), data.end());
+  // create rectangle window
     sf::RectangleShape bar(sf::Vector2f(CELL_SIZE, CELL_SIZE));
+  //full it with white color
     bar.setFillColor(sf::Color::White);
+  //loop in vector(which i store velues of living cells count) to draw histogram
     for (int i = 0; i < data.size(); i++) {
+      //here i get precentage living in grid 
         float res=(float)data[i]/ (gridSize*gridSize);
+      //here i take y axis long and multply with precentage to get how much full grid.
         bar.setPosition( ((i + 1) * CELL_SIZE),window.getSize().y-(res * CELL_SIZE *window.getSize().y) );
         window.draw(bar);
     }
