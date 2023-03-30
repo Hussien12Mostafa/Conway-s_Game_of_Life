@@ -61,7 +61,7 @@ sf::RenderWindow window(sf::VideoMode(gridSize * CELL_SIZE, gridSize * CELL_SIZE
 //draw board 
         draw_board(window, gridOne);
         deterministic(gridOne);
-        god1(gridOne);
+        //god1(gridOne);
         god2(gridOne);
         god3(gridOne);
         window.display();
@@ -182,11 +182,11 @@ void loopQuarterForGod2(bool gridOne[gridSize + 1][gridSize + 1],int startX,int 
   
   if (checkLive<10 && (float) rand()/RAND_MAX<probGod2)
     if (startX==1 && startY==1)
-      add_glunder(gridOne,startX+(gridSize/4)-6,startY+(gridSize/4)-15);
+      add_glunder(gridOne,startX+(gridSize/4)-20,startY+(gridSize/4)-15);
     else if(startX==1 && startY>=gridSize/2)
-      seed_pulsar(gridOne,startX+(gridSize/4)-6,startY+(gridSize/4)-6);
+      add_glunder(gridOne,startX+(gridSize/4)-20,startY+(gridSize/4)-6);
     else if(startX>=gridSize/2 && startY==1)
-      seed_pulsar(gridOne,startX+(gridSize/4)-6,startY+(gridSize/4)-15);
+      add_glunder(gridOne,startX+(gridSize/4)-6,startY+(gridSize/4)-15);
     else if(startX>=gridSize/2 && startY>=gridSize/2)
       add_glunder(gridOne,startX+(gridSize/4)-6,startY+(gridSize/4)-6);
     else
